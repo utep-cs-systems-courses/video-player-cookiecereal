@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import time, os, sys, re, threading, params, cv2
+import cv2, threading, params
 from threading import Thread
 from threading import Lock
 
@@ -9,7 +9,7 @@ switchesVarDefaults = (
     (('-f', '--frames'), 'frames', '72'),
     (('-?', '--usage'), "usage", False),
 )
-progname = "videoPlayer"
+progname = "playVideo"
 paramMap = params.parseParams(switchesVarDefaults)
 filename, usage = paramMap["video"], paramMap["usage"]
 numFrames = int(paramMap['frames']) # num of frames to display
@@ -53,7 +53,7 @@ def extractFrames(video_file, frames_q, maxFrames):
     vidcap = cv2.VideoCapture(video_file)
     #read one frame
     success, image = vidcap.read()
-    print(f'Reading Frame {count} {success}')
+    print(f'Reading Frame #{count} {success}')
 
     while success and count < maxFrames:
         #get a jpg encoded frame
@@ -62,7 +62,7 @@ def extractFrames(video_file, frames_q, maxFrames):
         frames_q.enqueue(jpgImage)
         #reading next frame
         success, image = vidcap.read()
-        print(f'Reading frame {count}')
+        print(f'Reading frame #{count}')
         #increment frame count
         count += 1
     #queue null for stopping point
@@ -77,7 +77,7 @@ def displayFrames(inputBuffer):
     frame = inputBuffer.dequeue()
 
     while frame is not None:
-        print(f'Displaying frame {count}')
+        print(f'Displaying frame #{count}')
         #decoding
         image = cv2.imdecode(frame, cv2.IMREAD_UNCHANGED)
         cv2.imshow('Video', image)
@@ -100,7 +100,7 @@ def convertGrayscale(frames_q, gray_q):
     inputFrame = frames_q.dequeue()
 
     while inputFrame is not None and count < numFrames:
-        print(f'Converting frame {count}')
+        print(f'Converting frame #{count}')
         #decode input frame back to image
         image = cv2.imdecode(inputFrame, cv2.IMREAD_UNCHANGED)
         #converting image to grayscale
